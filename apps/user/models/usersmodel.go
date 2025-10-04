@@ -3,6 +3,7 @@ package models
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/zeromicro/go-zero/core/stores/cache"
 	"github.com/zeromicro/go-zero/core/stores/sqlc"
@@ -17,6 +18,8 @@ type (
 	UsersModel interface {
 		usersModel
 		FindByPhone(ctx context.Context, phone string) (*Users, error)
+		ListByName(ctx context.Context, name string) ([]*Users, error)
+		ListByIds(ctx context.Context, ids []string) ([]*Users, error)
 	}
 
 	customUsersModel struct {
@@ -39,6 +42,34 @@ func (m *customUsersModel) FindByPhone(ctx context.Context, phone string) (*User
 	default:
 		return nil, err
 	}
+}
+
+// ListByName 根据用户名模糊查询用户列表
+func (m *customUsersModel) ListByName(ctx context.Context, name string) ([]*Users, error) {
+	var resp []*Users
+	query := fmt.Sprintf("select %s from %s where `nickname` like ?", usersRows, m.table)
+	likeName := "%" + name + "%"
+	err := m.QueryRowsNoCacheCtx(ctx, &resp, query, likeName)
+	if err != nil {
+		if err == sqlc.ErrNotFound {
+			return nil, ErrNotFound
+		}
+		return nil, err
+	}
+	return resp, nil
+}
+
+func (m *customUsersModel) ListByIds(ctx context.Context, ids []string) ([]*Users, error) {
+	var resp []*Users
+	query := fmt.Sprintf("select %s from %s where `id` in ('%s')", usersRows, m.table, strings.Join(ids, "','"))
+	err := m.QueryRowsNoCacheCtx(ctx, &resp, query)
+	if err != nil {
+		if err == sqlc.ErrNotFound {
+			return nil, ErrNotFound
+		}
+		return nil, err
+	}
+	return resp, nil
 }
 
 // NewUsersModel returns a model for the database table.

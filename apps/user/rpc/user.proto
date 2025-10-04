@@ -46,7 +46,7 @@ message RegisterResp{
 }
 
 message GetUserInfoReq{
-  string user = 1;
+  string id = 1;
 }
 
 message GetUserInfoResp{

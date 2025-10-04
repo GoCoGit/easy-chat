@@ -437,7 +437,7 @@ func (x *RegisterResp) GetExpire() int64 {
 
 type GetUserInfoReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	User          string                 `protobuf:"bytes,1,opt,name=user,proto3" json:"user,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -472,9 +472,9 @@ func (*GetUserInfoReq) Descriptor() ([]byte, []int) {
 	return file_apps_user_rpc_user_proto_rawDescGZIP(), []int{7}
 }
 
-func (x *GetUserInfoReq) GetUser() string {
+func (x *GetUserInfoReq) GetId() string {
 	if x != nil {
-		return x.User
+		return x.Id
 	}
 	return ""
 }
@@ -659,9 +659,9 @@ const file_apps_user_rpc_user_proto_rawDesc = "" +
 	"\x03sex\x18\x05 \x01(\x05R\x03sex\"<\n" +
 	"\fRegisterResp\x12\x14\n" +
 	"\x05Token\x18\x01 \x01(\tR\x05Token\x12\x16\n" +
-	"\x06expire\x18\x02 \x01(\x03R\x06expire\"$\n" +
-	"\x0eGetUserInfoReq\x12\x12\n" +
-	"\x04user\x18\x01 \x01(\tR\x04user\"7\n" +
+	"\x06expire\x18\x02 \x01(\x03R\x06expire\" \n" +
+	"\x0eGetUserInfoReq\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"7\n" +
 	"\x0fGetUserInfoResp\x12$\n" +
 	"\x04user\x18\x01 \x01(\v2\x10.user.UserEntityR\x04user\"I\n" +
 	"\vFindUserReq\x12\x12\n" +
