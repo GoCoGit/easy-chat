@@ -4,9 +4,9 @@ import (
 	"flag"
 	"fmt"
 
-	"easy-chat/apps/user/api/internal/config"
-	"easy-chat/apps/user/api/internal/handler"
-	"easy-chat/apps/user/api/internal/svc"
+	"easy-chat/apps/social/api/internal/config"
+	"easy-chat/apps/social/api/internal/handler"
+	"easy-chat/apps/social/api/internal/svc"
 	"easy-chat/pkg/resultx"
 
 	"github.com/zeromicro/go-zero/core/conf"
@@ -14,7 +14,7 @@ import (
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
-var configFile = flag.String("f", "etc/dev/user.yaml", "the config file")
+var configFile = flag.String("f", "etc/dev/social.yaml", "the config file")
 
 func main() {
 	flag.Parse()
