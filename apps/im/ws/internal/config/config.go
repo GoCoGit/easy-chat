@@ -6,4 +6,9 @@ type Config struct {
 	service.ServiceConf
 
 	ListenOn string
+
+	JwtAuth struct {
+		AccessSecret string
+		AccessExpire int64
+	}
 }
