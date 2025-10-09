@@ -22,9 +22,10 @@ type Server struct {
 	upgrader websocket.Upgrader
 
 	patten string
+	opt    *serverOption
 
-	connToUser map[*websocket.Conn]string
-	userToConn map[string]*websocket.Conn
+	connToUser map[*Conn]string
+	userToConn map[string]*Conn
 
 	logx.Logger
 }
@@ -39,9 +40,10 @@ func NewServer(addr string, opts ...ServerOptions) *Server {
 
 		patten:         opt.patten,
 		authentication: opt.Authentication,
+		opt:            &opt,
 
-		connToUser: make(map[*websocket.Conn]string),
-		userToConn: make(map[string]*websocket.Conn),
+		connToUser: make(map[*Conn]string),
+		userToConn: make(map[string]*Conn),
 
 		Logger: logx.WithContext(context.Background()),
 	}
@@ -60,16 +62,20 @@ func (s *Server) ServerWs(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
-	conn, err := s.upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		s.Errorf("Upgrade error: %v", err)
+	// conn, err := s.upgrader.Upgrade(w, r, nil)
+	conn := NewConn(s, w, r)
+	if conn == nil {
 		return
 	}
+	// if err != nil {
+	// 	s.Errorf("Upgrade error: %v", err)
+	// 	return
+	// }
 
 	if !s.authentication.Auth(w, r) {
-		conn.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("不存访问权限")))
+		// conn.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("不存访问权限")))
+		s.Send(&Message{FrameType: FrameData, Data: "不存访问权限"}, conn)
 		conn.Close()
-		s.Errorf("Auth error: %v", err)
 		return
 	}
 
@@ -80,23 +86,29 @@ func (s *Server) ServerWs(w http.ResponseWriter, r *http.Request) {
 	go s.handleConn(conn)
 }
 
-func (s *Server) AddConn(conn *websocket.Conn, req *http.Request) {
+func (s *Server) AddConn(conn *Conn, req *http.Request) {
 	s.RWMutex.Lock()
 	defer s.RWMutex.Unlock()
 
 	uid := s.authentication.UserId(req)
+
+	// 不允许重复登录，如果已经登录，则关闭旧的连接
+	if c := s.userToConn[uid]; c != nil {
+		s.Close(c)
+	}
+
 	s.connToUser[conn] = uid
 	s.userToConn[uid] = conn
 }
 
-func (s *Server) GetConn(uid string) *websocket.Conn {
+func (s *Server) GetConn(uid string) *Conn {
 	s.RWMutex.RLock()
 	defer s.RWMutex.RUnlock()
 
 	return s.userToConn[uid]
 }
 
-func (s *Server) GetConns(uids ...string) []*websocket.Conn {
+func (s *Server) GetConns(uids ...string) []*Conn {
 	if len(uids) == 0 {
 		return nil
 	}
@@ -104,14 +116,14 @@ func (s *Server) GetConns(uids ...string) []*websocket.Conn {
 	s.RWMutex.RLock()
 	defer s.RWMutex.RUnlock()
 
-	res := make([]*websocket.Conn, 0, len(uids))
+	res := make([]*Conn, 0, len(uids))
 	for _, uid := range uids {
 		res = append(res, s.userToConn[uid])
 	}
 	return res
 }
 
-func (s *Server) GetUsers(conns ...*websocket.Conn) []string {
+func (s *Server) GetUsers(conns ...*Conn) []string {
 
 	s.RWMutex.RLock()
 	defer s.RWMutex.RUnlock()
@@ -134,7 +146,7 @@ func (s *Server) GetUsers(conns ...*websocket.Conn) []string {
 	return res
 }
 
-func (s *Server) Close(conn *websocket.Conn) {
+func (s *Server) Close(conn *Conn) {
 	s.RWMutex.Lock()
 	defer s.RWMutex.Unlock()
 
@@ -151,7 +163,7 @@ func (s *Server) Close(conn *websocket.Conn) {
 }
 
 // 根据连接对象进行任务处理
-func (s *Server) handleConn(conn *websocket.Conn) {
+func (s *Server) handleConn(conn *Conn) {
 	for {
 		_, msg, err := conn.ReadMessage()
 		if err != nil {
@@ -160,6 +172,7 @@ func (s *Server) handleConn(conn *websocket.Conn) {
 			return
 		}
 
+		// 解析消息
 		var message Message
 		err = json.Unmarshal(msg, &message)
 		if err != nil {
@@ -168,11 +181,17 @@ func (s *Server) handleConn(conn *websocket.Conn) {
 			return
 		}
 
-		// 根据请求method分发路由
-		if handler, ok := s.routes[message.Method]; ok {
-			handler(s, conn, &message)
-		} else {
-			conn.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("不存在执行的方法 %v 请检查", message.Method)))
+		// 根据消息类型进行处理
+		switch message.FrameType {
+		case FramePing:
+			s.Send(&Message{FrameType: FramePing}, conn)
+		case FrameData:
+			// 根据请求method分发路由
+			if handler, ok := s.routes[message.Method]; ok {
+				handler(s, conn, &message)
+			} else {
+				s.Send(&Message{FrameType: FrameData, Data: fmt.Sprintf("不存在执行的方法 %v 请检查", message.Method)}, conn)
+			}
 		}
 	}
 }
@@ -185,7 +204,7 @@ func (s *Server) SendByUserId(msg interface{}, sendIds ...string) error {
 	return s.Send(msg, s.GetConns(sendIds...)...)
 }
 
-func (s *Server) Send(msg interface{}, conns ...*websocket.Conn) error {
+func (s *Server) Send(msg interface{}, conns ...*Conn) error {
 	if len(conns) == 0 {
 		return nil
 	}
