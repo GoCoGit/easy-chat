@@ -4,3 +4,7 @@ ListenOn: 0.0.0.0:10090
 JwtAuth:
   AccessSecret: goco.ink
   AccessExpire: 864000
+
+Mongo:
+  Url: mongodb://root:easy-chat@192.168.18.48:47017
+  Db: easy-chat

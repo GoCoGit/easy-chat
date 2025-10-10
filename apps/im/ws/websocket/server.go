@@ -87,13 +87,14 @@ func (s *Server) ServerWs(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) AddConn(conn *Conn, req *http.Request) {
+	uid := s.authentication.UserId(req)
+
 	s.RWMutex.Lock()
 	defer s.RWMutex.Unlock()
 
-	uid := s.authentication.UserId(req)
-
 	// 不允许重复登录，如果已经登录，则关闭旧的连接
 	if c := s.userToConn[uid]; c != nil {
+		fmt.Println("close old conn")
 		s.Close(c)
 	}
 
@@ -112,7 +113,6 @@ func (s *Server) GetConns(uids ...string) []*Conn {
 	if len(uids) == 0 {
 		return nil
 	}
-
 	s.RWMutex.RLock()
 	defer s.RWMutex.RUnlock()
 
@@ -164,6 +164,9 @@ func (s *Server) Close(conn *Conn) {
 
 // 根据连接对象进行任务处理
 func (s *Server) handleConn(conn *Conn) {
+	uids := s.GetUsers(conn)
+	conn.Uid = uids[0]
+
 	for {
 		_, msg, err := conn.ReadMessage()
 		if err != nil {
