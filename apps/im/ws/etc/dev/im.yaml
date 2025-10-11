@@ -8,3 +8,8 @@ JwtAuth:
 Mongo:
   Url: mongodb://root:easy-chat@192.168.18.48:47017
   Db: easy-chat
+
+MsgChatTransfer:
+  Topic: msgChatTransfer
+  Addrs:
+    - 192.168.18.48:9092

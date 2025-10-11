@@ -9,12 +9,18 @@ require (
 	github.com/gorilla/websocket v1.5.0
 	github.com/jinzhu/copier v0.4.0
 	github.com/pkg/errors v0.9.1
+	github.com/zeromicro/go-queue v1.2.2
 	github.com/zeromicro/go-zero v1.9.0
 	github.com/zeromicro/x v0.0.0-20240408115609-8224c482b07e
 	go.mongodb.org/mongo-driver/v2 v2.3.0
 	golang.org/x/crypto v0.39.0
 	google.golang.org/grpc v1.75.1
 	google.golang.org/protobuf v1.36.10
+)
+
+require (
+	github.com/pierrec/lz4/v4 v4.1.21 // indirect
+	github.com/segmentio/kafka-go v0.4.47 // indirect
 )
 
 require (
