@@ -71,6 +71,7 @@ func NewServer(addr string, opts ...ServerOptions) *Server {
 	}
 }
 
+// 添加路由，将路由列表添加到server的routes中
 func (s *Server) AddRoutes(rs []Route) {
 	for _, r := range rs {
 		s.routes[r.Method] = r.Handler
@@ -108,6 +109,7 @@ func (s *Server) ServerWs(w http.ResponseWriter, r *http.Request) {
 	go s.handleConn(conn)
 }
 
+// 添加连接，需同时记录conn到user和user到conn的映射
 func (s *Server) AddConn(conn *Conn, req *http.Request) {
 	uid := s.authentication.UserId(req)
 
@@ -124,6 +126,7 @@ func (s *Server) AddConn(conn *Conn, req *http.Request) {
 	s.userToConn[uid] = conn
 }
 
+// 根据用户id获取连接
 func (s *Server) GetConn(uid string) *Conn {
 	s.RWMutex.RLock()
 	defer s.RWMutex.RUnlock()
@@ -131,6 +134,7 @@ func (s *Server) GetConn(uid string) *Conn {
 	return s.userToConn[uid]
 }
 
+// 根据多个用户id获取多个连接
 func (s *Server) GetConns(uids ...string) []*Conn {
 	if len(uids) == 0 {
 		return nil
@@ -145,6 +149,7 @@ func (s *Server) GetConns(uids ...string) []*Conn {
 	return res
 }
 
+// 根据连接获取用户id
 func (s *Server) GetUsers(conns ...*Conn) []string {
 
 	s.RWMutex.RLock()
@@ -223,6 +228,7 @@ func (s *Server) handleConn(conn *Conn) {
 	}
 }
 
+// websocket发送消息的封装，支持传入多个用户id，遍历发送
 func (s *Server) SendByUserId(msg interface{}, sendIds ...string) error {
 	if len(sendIds) == 0 {
 		return nil
@@ -231,6 +237,7 @@ func (s *Server) SendByUserId(msg interface{}, sendIds ...string) error {
 	return s.Send(msg, s.GetConns(sendIds...)...)
 }
 
+// websocket发送消息的封装，支持传入多个conn，遍历发送
 func (s *Server) Send(msg interface{}, conns ...*Conn) error {
 	if len(conns) == 0 {
 		return nil

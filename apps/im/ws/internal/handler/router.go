@@ -9,6 +9,8 @@ import (
 )
 
 func RegisterHandlers(srv *websocket.Server, svc *svc.ServiceContext) {
+	// 注册路由，Method是模式，Handler是处理的回调
+	// 将list传入server.go的AddRoutes方法，添加到server的routes中
 	srv.AddRoutes([]websocket.Route{
 		{
 			Method:  "user.online",
