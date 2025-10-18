@@ -66,6 +66,12 @@ func (l *SetUpUserConversationLogic) SetUpUserConversation(in *im.SetUpUserConve
 		if err != nil {
 			return nil, err
 		}
+
+	case constants.GroupChatType:
+		err := l.setUpUserConversation(in.RecvId, in.SendId, in.RecvId, constants.GroupChatType, true)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return &res, nil
@@ -100,7 +106,7 @@ func (l *SetUpUserConversationLogic) setUpUserConversation(conversationId, userI
 	// 添加会话记录
 	conversations.ConversationList[conversationId] = &immodels.Conversation{
 		ConversationId: conversationId,
-		ChatType:       constants.SingleChatType,
+		ChatType:       chatType,
 		IsShow:         isShow,
 	}
 

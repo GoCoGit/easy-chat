@@ -29,6 +29,6 @@ func main() {
 	for _, s := range listen.Services() {
 		serviceGroup.Add(s)
 	}
-	fmt.Println("Starting queue at ...")
+	fmt.Printf("Starting queue at %s\n", c.ListenOn)
 	serviceGroup.Start()
 }

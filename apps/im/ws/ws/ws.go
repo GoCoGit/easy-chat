@@ -25,9 +25,10 @@ type (
 	Push struct {
 		ConversationId     string `mapstructure:"conversationId"`
 		constants.ChatType `mapstructure:"chatType"`
-		SendId             string `mapstructure:"sendId"`
-		RecvId             string `mapstructure:"recvId"`
-		SendTime           int64  `mapstructure:"sendTime"`
+		SendId             string   `mapstructure:"sendId"`
+		RecvId             string   `mapstructure:"recvId"`
+		RecvIds            []string `mapstructure:"recvIds"` // 群聊发送给多个用户
+		SendTime           int64    `mapstructure:"sendTime"`
 
 		constants.MType `mapstructure:"mType"`
 		Content         string `mapstructure:"content"`

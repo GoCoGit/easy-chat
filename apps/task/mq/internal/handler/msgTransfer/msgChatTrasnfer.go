@@ -7,6 +7,7 @@ import (
 
 	"easy-chat/apps/im/immodels"
 	"easy-chat/apps/im/ws/websocket"
+	"easy-chat/apps/social/rpc/socialclient"
 	"easy-chat/apps/task/mq/internal/svc"
 	"easy-chat/apps/task/mq/mq"
 	"easy-chat/pkg/constants"
@@ -41,7 +42,47 @@ func (m *MsgChatTransfer) Consume(ctx context.Context, key, value string) error 
 		return err
 	}
 
+	switch data.ChatType {
+	case constants.SingleChatType:
+		return m.singleChat(ctx, &data)
+	case constants.GroupChatType:
+		return m.groupChat(ctx, &data)
+	}
+	return nil
+}
+
+func (m *MsgChatTransfer) singleChat(ctx context.Context, data *mq.MsgChatTransfer) error {
 	// 推送消息
+	return m.svc.WsClient.Send(websocket.Message{
+		FrameType: websocket.FrameData,
+		Method:    "push",
+		FromId:    constants.SYSTEM_ROOT_UID,
+		Data:      data,
+	})
+}
+
+func (m *MsgChatTransfer) groupChat(ctx context.Context, data *mq.MsgChatTransfer) error {
+	// 查询群的用户
+	fmt.Println("====================")
+	fmt.Println(data.ConversationId)
+	fmt.Println("====================")
+	users, err := m.svc.Social.GroupUsers(ctx, &socialclient.GroupUsersReq{
+		GroupId: data.ConversationId,
+	})
+	if err != nil {
+		return err
+	}
+
+	data.RecvIds = make([]string, 0, len(users.List))
+
+	for _, members := range users.List {
+		if members.UserId == data.SendId {
+			continue
+		}
+
+		data.RecvIds = append(data.RecvIds, members.UserId)
+	}
+
 	return m.svc.WsClient.Send(websocket.Message{
 		FrameType: websocket.FrameData,
 		Method:    "push",

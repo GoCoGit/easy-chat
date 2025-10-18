@@ -11,6 +11,7 @@ import (
 
 	"github.com/gorilla/websocket"
 	"github.com/zeromicro/go-zero/core/logx"
+	"github.com/zeromicro/go-zero/core/threading"
 )
 
 type AckType int
@@ -36,6 +37,8 @@ func (a AckType) String() string {
 
 type Server struct {
 	sync.RWMutex
+
+	*threading.TaskRunner // ws并发发送
 
 	authentication Authentication
 
@@ -68,6 +71,8 @@ func NewServer(addr string, opts ...ServerOptions) *Server {
 		userToConn: make(map[string]*Conn),
 
 		Logger: logx.WithContext(context.Background()),
+
+		TaskRunner: threading.NewTaskRunner(opt.concurrency),
 	}
 }
 

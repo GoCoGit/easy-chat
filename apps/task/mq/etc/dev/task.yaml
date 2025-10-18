@@ -1,6 +1,12 @@
 Name: task.mq
 ListenOn: 0.0.0.0:10091
 
+SocialRpc:
+  Etcd:
+    Hosts:
+    - 192.168.18.48:3379
+    Key: social.rpc
+
 MsgChatTransfer:
   Name: MsgChatTransfer
   Brokers:
