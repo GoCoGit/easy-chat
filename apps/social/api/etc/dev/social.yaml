@@ -14,6 +14,12 @@ UserRpc:
     - 192.168.18.48:3379
     Key: user.rpc
 
+ImRpc:
+  Etcd:
+    Hosts:
+    - 192.168.18.48:3379
+    Key: im.rpc
+
 JwtAuth:
   AccessSecret: goco.ink
   AccessExpire: 864000

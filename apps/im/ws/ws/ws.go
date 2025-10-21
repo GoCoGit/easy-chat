@@ -1,16 +1,13 @@
-/**
- * @author: dn-jinmin/dn-jinmin
- * @doc:
- */
-
 package ws
 
 import "easy-chat/pkg/constants"
 
 type (
 	Msg struct {
+		MsgId           string `mapstructure:"msgId"`
 		constants.MType `mapstructure:"mType"`
-		Content         string `mapstructure:"content"`
+		ReadRecords     map[string]string `mapstructure:"readRecords"`
+		Content         string            `mapstructure:"content"`
 	}
 
 	Chat struct {
@@ -30,7 +27,18 @@ type (
 		RecvIds            []string `mapstructure:"recvIds"` // 群聊发送给多个用户
 		SendTime           int64    `mapstructure:"sendTime"`
 
+		MsgId       string                `mapstructure:"msgId"`
+		ReadRecords map[string]string     `mapstructure:"readRecords"`
+		ContentType constants.ContentType `mapstructure:"contentType"`
+
 		constants.MType `mapstructure:"mType"`
 		Content         string `mapstructure:"content"`
+	}
+
+	MarkRead struct {
+		constants.ChatType `mapstructure:"chatType"`
+		ConversationId     string   `mapstructure:"conversationId"`
+		RecvId             string   `mapstructure:"recvId"`
+		MsgIds             []string `mapstructure:"msgIds"`
 	}
 )

@@ -5,7 +5,6 @@ import (
 	"easy-chat/apps/im/ws/websocket"
 	"easy-chat/apps/im/ws/ws"
 	"easy-chat/pkg/constants"
-	"fmt"
 
 	"github.com/mitchellh/mapstructure"
 )
@@ -42,16 +41,15 @@ func single(srv *websocket.Server, data *ws.Push, recvId string) error {
 		ChatType:       data.ChatType,
 		SendTime:       data.SendTime,
 		Msg: ws.Msg{
-			MType:   data.MType,
-			Content: data.Content,
+			MsgId:       data.MsgId,
+			MType:       data.MType,
+			Content:     data.Content,
+			ReadRecords: data.ReadRecords,
 		},
 	}), rconn)
 }
 
 func group(srv *websocket.Server, data *ws.Push) error {
-	fmt.Println("====================")
-	fmt.Println(data.RecvIds)
-	fmt.Println("====================")
 	for _, id := range data.RecvIds {
 		func(id string) {
 			srv.Schedule(func() {

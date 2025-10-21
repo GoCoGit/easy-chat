@@ -21,4 +21,9 @@ type Config struct {
 		Topic string
 		Addrs []string
 	}
+
+	MsgReadTransfer struct {
+		Topic string
+		Addrs []string
+	}
 }
