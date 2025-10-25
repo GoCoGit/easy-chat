@@ -1,0 +1,15 @@
+host: 0.0.0.0
+jwtauth:
+    accessexpire: 864000
+    accesssecret: goco.ink
+name: user
+port: 8888
+redisx:
+    host: 192.168.18.48:16379
+    pass: easy-chat
+    type: node
+userrpc:
+    etcd:
+        hosts:
+            - 192.168.18.48:3379
+        key: user.rpc

@@ -20,6 +20,11 @@ ImRpc:
     - 192.168.18.48:3379
     Key: im.rpc
 
+Redisx:
+  Host: 192.168.18.48:16379
+  Type: node
+  Pass: easy-chat
+
 JwtAuth:
   AccessSecret: goco.ink
   AccessExpire: 864000

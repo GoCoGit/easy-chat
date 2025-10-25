@@ -14,6 +14,12 @@ type Config struct {
 	MsgChatTransfer kq.KqConf
 	MsgReadTransfer kq.KqConf
 
+	MsgReadHandler struct {
+		GroupMsgReadHandler          int
+		GroupMsgReadRecordDelayTime  int64
+		GroupMsgReadRecordDelayCount int
+	}
+
 	Redisx redis.RedisConf
 	Mongo  struct {
 		Url string

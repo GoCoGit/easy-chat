@@ -3,6 +3,7 @@ package mq
 import "easy-chat/pkg/constants"
 
 type MsgChatTransfer struct {
+	MsgId              string `json:"msgId"`
 	ConversationId     string `json:"conversationId"`
 	constants.ChatType `json:"chatType"`
 	SendId             string   `json:"sendId"`

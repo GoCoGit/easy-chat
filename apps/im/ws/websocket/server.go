@@ -59,9 +59,13 @@ func NewServer(addr string, opts ...ServerOptions) *Server {
 	opt := newServerOptions(opts...)
 
 	return &Server{
-		routes:   make(map[string]HandlerFunc),
-		addr:     addr,
-		upgrader: websocket.Upgrader{},
+		routes: make(map[string]HandlerFunc),
+		addr:   addr,
+		upgrader: websocket.Upgrader{
+			CheckOrigin: func(r *http.Request) bool {
+				return true
+			},
+		},
 
 		patten:         opt.patten,
 		authentication: opt.Authentication,
