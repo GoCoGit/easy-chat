@@ -4,10 +4,10 @@ import (
 	"easy-chat/apps/task/mq/internal/config"
 	"easy-chat/apps/task/mq/internal/handler"
 	"easy-chat/apps/task/mq/internal/svc"
+	"easy-chat/pkg/configserver"
 	"flag"
 	"fmt"
 
-	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/core/service"
 )
 
@@ -17,7 +17,31 @@ func main() {
 	flag.Parse()
 
 	var c config.Config
-	conf.MustLoad(*configFile, &c)
+	// conf.MustLoad(*configFile, &c)
+
+	var configs = "task-mq.yaml"
+	err := configserver.NewConfigServer(*configFile, configserver.NewSail(&configserver.Config{
+		ETCDEndpoints:  "192.168.18.48:3379",
+		ProjectKey:     "98c6f2c2287f4c73cea3d40ae7ec3ff2",
+		Namespace:      "task",
+		Configs:        configs,
+		ConfigFilePath: "../etc/conf",
+		// ConfigFilePath: "./etc/conf",
+		LogLevel: "DEBUG",
+	})).MustLoad(&c, func(bytes []byte) error {
+		var c config.Config
+		err := configserver.LoadFromJsonBytes(bytes, &c)
+		if err != nil {
+			fmt.Println("config read err :", err)
+		}
+		fmt.Println(configs, "config has changed")
+
+		return nil
+	})
+
+	if err != nil {
+		panic(err)
+	}
 
 	if err := c.SetUp(); err != nil {
 		panic(err)
