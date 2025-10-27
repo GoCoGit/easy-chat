@@ -23,7 +23,7 @@ func main() {
 	var configs = "social-api.yaml"
 	err := configserver.NewConfigServer(*configFile, configserver.NewSail(&configserver.Config{
 		ETCDEndpoints:  "192.168.18.48:3379",
-		ProjectKey:     "98c6f2c2287f4c73cea3d40ae7ec3ff2",
+		ProjectKey:     "dca19ffa163054feef33432fad5f9833",
 		Namespace:      "social",
 		Configs:        configs,
 		ConfigFilePath: "../etc/conf",

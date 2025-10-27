@@ -11,9 +11,6 @@ A real-time messaging system built with Go-Zero microservices architecture, feat
 - **Social Features**: Friend management, group management, message push
 - **Data Storage**: MySQL and MongoDB hybrid storage
 - **Cache Optimization**: Redis caching for improved performance
-- **Dynamic Configuration**: Sail configuration center for hot-reload
-- **Distributed Tracing**: Jaeger integration for request tracing across services
-- **API Gateway**: Apache APISIX for routing and load balancing
 
 ## Tech Stack
 
